@@ -22,10 +22,37 @@
         @include('partials.admin.header')
       <!--  Header End -->
       <div class="container-fluid">
+        {{-- Breadcumbs --}}
+        @if (isset($breadcrumbs))
+        <div class="page-header">
+          <div class="row">
+            <div class="col">
+              <div class="page-header-left">
+                <h3>@yield('title')</h3>
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="{{ route('admin.index') }}"><i class="ti ti-home text-dark"></i></a></li>
+                  @foreach($breadcrumbs->attributes as $key => $attributes)
+                    @if ($key == "route")
+                      @foreach ($attributes as $attribute)
+                        @if ($loop->last)
+                          @break
+                        @endif
+                        <li class="breadcrumb-item"><a href="{{ route($attribute['route']) }}" class="text-dark">{{ $attribute['name'] }}</a></li>
+                      @endforeach
+                        <li class="breadcrumb-item"><a href="{{ isset(end($attributes)['route']) ? route(end($attributes)['route']) : 'javascript::void(0);' }}">{{ end($attributes)['name'] }}</a></li>
+                    @endif
+                  @endforeach
+                  {{ $breadcrumbs ?? '' }}
+                </ol>
+              </div>
+            </div>
+          </div>            
+        @endif
+        {{-- End Breadcrumbs --}}
         <!--  Row 1 -->
         {{ $slot }}
         <div class="py-6 px-6 text-center">
-          <p class="mb-0 fs-4">Developed by <a href="https://instagram.com/zidanfikriaditya" target="_blank" class="pe-1 text-primary text-decoration-underline">Zidan Fikri Aditya</a> Powered template by <a href="https://themewagon.com">ThemeWagon</a></p>
+          <p class="mb-0 fs-4">Developed by <a href="https://zidanfikriaditya.vercel.app" target="_blank" class="pe-1 text-primary text-decoration-underline">Zidan Fikri Aditya</a> Powered template by <a href="https://themewagon.com">ThemeWagon</a></p>
         </div>
       </div>
     </div>
@@ -34,9 +61,11 @@
   <script src="{{ url('assets') }}/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{{ url('assets') }}/js/sidebarmenu.js"></script>
   <script src="{{ url('assets') }}/js/app.min.js"></script>
-  <script src="{{ url('assets') }}/libs/apexcharts/dist/apexcharts.min.js"></script>
-  <script src="{{ url('assets') }}/libs/simplebar/dist/simplebar.js"></script>
-  <script src="{{ url('assets') }}/js/dashboard.js"></script>
+
+  @isset($scripts)
+      {{ $scripts }}
+  @endisset
+  @stack('scripts')
 </body>
 
 </html>

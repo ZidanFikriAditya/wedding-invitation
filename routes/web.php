@@ -39,7 +39,7 @@ Route::group([
 
     Route::resource('template-undangan', \App\Http\Controllers\Admin\TemplateLetterController::class);
     Route::resource('undangan', \App\Http\Controllers\Admin\ShareLetterController::class);
-    Route::resource('acara', \App\Http\Controllers\Admin\ProgramController::class);
+    Route::resource('acara', \App\Http\Controllers\Admin\ProgramController::class)->only(['index', 'store']);
 
 });
 

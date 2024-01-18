@@ -47,6 +47,6 @@ class User extends Authenticatable
 
     public function program()
     {
-        return $this->hasOne(Program::class);
+        return $this->hasOne(Program::class, 'owned_id', 'id');
     }
 }

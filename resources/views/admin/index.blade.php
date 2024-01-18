@@ -343,4 +343,11 @@
       </div>
     </div>
   </div>
+
+
+  <x-slot name="scripts">
+  <script src="{{ url('assets') }}/libs/apexcharts/dist/apexcharts.min.js"></script>
+  <script src="{{ url('assets') }}/libs/simplebar/dist/simplebar.js"></script>
+  <script src="{{ url('assets') }}/js/dashboard.js"></script>
+  </x-slot>
 </x-admin-layout>
