@@ -19,6 +19,8 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->json('social_media')->nullable();
 
+            $table->json('others')->nullable();
+
             $table->foreignIdFor(\App\Models\User::class, 'owned_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

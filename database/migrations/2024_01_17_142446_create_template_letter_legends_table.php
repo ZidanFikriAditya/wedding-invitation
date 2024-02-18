@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('template_letter_legends', function (Blueprint $table) {
-            $table->id();
             $table->foreignIdFor(\App\Models\TemplateLetter::class, 'template_letter_id')->constrained('template_letters')->cascadeOnDelete();
             $table->string('legend');
             $table->string('description');
+            $table->string('type')->default('text');
             $table->timestamps();
         });
     }

@@ -9,6 +9,9 @@ class TemplateLetterLegend extends Model
 {
     use HasFactory;
 
+    public $primaryKey = null;
+    public $incrementing = false;
+
     protected $fillable = [
         'legend',
         'description',

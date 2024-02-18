@@ -38,6 +38,8 @@ Route::group([
     })->name('index');
 
     Route::resource('template-undangan', \App\Http\Controllers\Admin\TemplateLetterController::class);
+    Route::post('template-undangan-data/data-table', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'data'])->name('template-undangan.data');
+    Route::post('template-undangan-upload', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'uploadTemplateLetter'])->name('template-undangan-upload');
     Route::resource('undangan', \App\Http\Controllers\Admin\ShareLetterController::class);
     Route::resource('acara', \App\Http\Controllers\Admin\ProgramController::class)->only(['index', 'store']);
 

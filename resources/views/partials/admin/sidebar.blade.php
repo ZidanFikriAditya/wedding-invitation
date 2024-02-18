@@ -42,7 +42,7 @@
             <span class="hide-menu">SUB MENU</span>
           </li>
           <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ route('admin.template-undangan.index') }}" aria-expanded="false">
+            <a class="sidebar-link {{ Request::is('admin/template-undangan*') ? 'active' : '' }}" href="{{ route('admin.template-undangan.index') }}" aria-expanded="false">
               <span>
                 <i class="ti ti-file-x"></i>
               </span>
@@ -50,7 +50,7 @@
             </a>
           </li>
           <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ route('admin.undangan.index') }}" aria-expanded="false">
+            <a class="sidebar-link {{ Request::is('admin/undangan*') ? 'active' : '' }}" href="{{ route('admin.undangan.index') }}" aria-expanded="false">
               <span>
                 <i class="ti ti-file-plus"></i>
               </span>
