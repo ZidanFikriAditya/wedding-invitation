@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Select2\ResponsePaginate;
 use Illuminate\Http\Request;
 use App\Models\TemplateLetter as model;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,7 @@ class TemplateLetterController extends Controller
             'title' => 'required|string',
             'upload_zip' => 'required|file|mimes:zip|max:10240',
         ]);
-        
+
         $validated['owned_id'] = auth()->id();
 
         DB::beginTransaction();
@@ -73,7 +74,7 @@ class TemplateLetterController extends Controller
             $model->uploadTemplateLetter()->create([
                 'path_template' => 'template-undangan/' . $model->id
             ]);
-            
+
             DB::commit();
             return redirect()->route('admin.template-undangan.show', md5("--$model->id--"))->with('success', 'Data berhasil disimpan');
         } catch (\Exception $e) {
@@ -81,7 +82,7 @@ class TemplateLetterController extends Controller
             dd($e->getMessage());
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
-        
+
 
     }
 
@@ -112,7 +113,7 @@ class TemplateLetterController extends Controller
             'legend_name.*' => 'required|string',
             'legend_type.*' => 'required|string',
         ]);
-        
+
         $validated['body'] = trim(str_replace(url("storage/template-undangan"), '{storage}', $validated['body']));
 
         DB::beginTransaction();
@@ -127,7 +128,7 @@ class TemplateLetterController extends Controller
 
             $model->fill($validated);
             $model->save();
-    
+
             $model->legends()->delete();
             $model->legends()->createMany(
                 collect($validated['legends'])->map(function ($legend) use ($request) {
@@ -139,17 +140,17 @@ class TemplateLetterController extends Controller
                 try {
                     Storage::deleteDirectory($model->uploadTemplateLetter->path_template);
                 } catch (\Exception $e) {}
-    
+
                 $file = $request->file('upload_zip');
                 $zip = new ZipArchive;
                 $zip->open($file);
                 $zip->extractTo(storage_path('app/public/template-undangan/' . $model->id));
-    
+
                 $model->uploadTemplateLetter()->update([
                     'path_template' => 'template-undangan/' . $model->id
                 ]);
             }
-    
+
             DB::commit();
             return redirect()->route('admin.template-undangan.index');
         } catch (\Exception $e) {
@@ -201,12 +202,12 @@ class TemplateLetterController extends Controller
                 try {
                     Storage::deleteDirectory($model->uploadTemplateLetter->path_template);
                 } catch (\Exception $e) {}
-    
+
                 $file = $request->file('upload_zip');
                 $zip = new ZipArchive;
                 $zip->open($file);
                 $zip->extractTo(storage_path('app/public/template-undangan/' . $model->id));
-    
+
                 $model->uploadTemplateLetter()->update([
                     'path_template' => 'template-undangan/' . $model->id
                 ]);
@@ -215,19 +216,32 @@ class TemplateLetterController extends Controller
                 $zip = new ZipArchive;
                 $zip->open($file);
                 $zip->extractTo(storage_path('app/public/template-undangan/' . $model->id));
-    
+
                 $model->uploadTemplateLetter()->create([
                     'path_template' => 'template-undangan/' . $model->id
                 ]);
             }
-    
+
             DB::commit();
-            return response()->json(['message' => 'Data berhasil diupload', 'id' => md5("--$model->id--")]);        
+            return response()->json(['message' => 'Data berhasil diupload', 'id' => md5("--$model->id--")]);
             //code...
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json(['error' => $th->getMessage()], 500);
             //throw $th;
         }
+    }
+
+    public function select2(Request $request)
+    {
+        $model = model::query()
+            ->selectRaw('id, title as text')
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('title', 'like', "%$request->search%");
+            })
+            ->paginate(10, ['id', 'text'], 'page', $request->page);
+
+
+        return ResponsePaginate::collection($model);
     }
 }

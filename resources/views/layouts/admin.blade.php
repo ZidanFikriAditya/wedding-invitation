@@ -10,6 +10,11 @@
   <link rel="stylesheet" href="{{ url('assets') }}/css/styles.min.css" />
   <link rel="stylesheet" href="{{ url('summernote') }}/summernote.min.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    @if(isset($styles))
+        {{ $styles }}
+    @endif
 </head>
 
 <body aria-live="polite" aria-atomic="true" class=" position-relative">
@@ -49,7 +54,7 @@
                 </ol>
               </div>
             </div>
-          </div>            
+          </div>
         @endif
         {{-- End Breadcrumbs --}}
         <!--  Row 1 -->
@@ -82,6 +87,7 @@
   <script src="{{ url('assets') }}/js/app.min.js"></script>
   <script src="{{ url('summernote') }}/summernote.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <script>
     function showToast(type, message) {
