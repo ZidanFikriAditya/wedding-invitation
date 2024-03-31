@@ -15,7 +15,8 @@ class TemplateLetterLegend extends Model
     protected $fillable = [
         'legend',
         'description',
-        'template_letter_id'
+        'template_letter_id',
+        'type'
     ];
 
     public function templateLetter()

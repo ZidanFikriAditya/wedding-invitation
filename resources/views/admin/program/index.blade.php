@@ -3,6 +3,9 @@
 @endphp
 
 <x-admin-layout>
+    <x-slot name="styles">
+        <script src="/assets/js/helpers.js"></script>
+    </x-slot>
     <x-slot name="breadcrumbs" :route="[
         ['name' => 'Dashboard', 'route' => 'admin.index'],
         ['name' => 'Edit Acara'],
@@ -29,16 +32,16 @@
                 @csrf
                 <div class="row">
                     <div class="col-md-4 mb-2">
-                        <x-bootstrap-input :value="$auth->program?->name ?? old('name')" name="name" placeholder="Name ..." type="text" label="Nama Acara" required />
+                        <x-bootstrap-input :value="old('name') ?? $auth->program?->name" name="name" placeholder="Name ..." type="text" label="Nama Acara" required />
                     </div>
                     <div class="col-md-4 mb-2">
-                        <x-bootstrap-input :value="$auth->program?->phone_number ?? old('phone_number')" name="phone_number" placeholder="Nomor telepon..." type="text" label="Nomor HP" />
+                        <x-bootstrap-input :value="old('phone_number') ?? $auth->program?->phone_number" name="phone_number" placeholder="Nomor telepon..." type="text" label="Nomor HP" />
                     </div>
                     <div class="col-md-4 mb-2">
-                        <x-bootstrap-input :value="$auth->program?->address ?? old('address')" name="address" placeholder="Alamat..." type="text" label="Alamat" />
+                        <x-bootstrap-input :value="old('address') ?? $auth->program?->address" name="address" placeholder="Alamat..." type="text" label="Alamat" />
                     </div>
                     <div class="col-md-12 mb-2">
-                        <x-bootstrap-input :value="$auth->program?->description ?? old('description')" name="description" placeholder="Deskripsi..." type="textarea" label="Deskripsi" />
+                        <x-bootstrap-input :value="old('description') ?? $auth->program?->description" name="description" placeholder="Deskripsi..." type="textarea" label="Deskripsi" />
                     </div>
 
                     <div class="col-md-12">
@@ -75,9 +78,23 @@
                             @endif
                         </div>
                     </div>
+
+                    <div class="col-md-4">
+                        <x-bootstrap-input type="select" name="template_letter_id" label="Template Surat" :url="route('admin.select2.template-undangan')"  onchange="handleChangeSelectTemplate(event)">
+                            @if (old('template_letter_id') || $auth->program?->templateLetter?->id)
+                                <option value="{{ old('template_letter_id') ?? md5("--" . $auth->program?->templateLetter?->id . "--") }}">{{ old('template_letter_name') ?? $auth->program?->templateLetter?->title }}</option>
+                            @endif
+                        </x-bootstrap-input>
+                        <input type="hidden" name="template_letter_name" value="{{ old('template_letter_name') }}">
+                    </div>
+
+                    <div class="col-12" id="utils-template-letter">
+
+                    </div>
                 </div>
             </form>
         </div>
+
         <div class="card-footer bg-white border-top text-end">
             <button type="submit" class="btn btn-primary" onclick="$('#submit-form-program').submit()">Simpan</button>
         </div>
@@ -110,7 +127,15 @@
 
     <x-slot name="scripts">
         <script>
-            let iterationItem = {{ count(old('type_medsos') ?? $auth->program?->social_media ?? []) }} ?? 0;
+            let iterationItem = parseInt('{{ count(old('type_medsos') ?? $auth->program?->social_media ?? []) }}');
+            const others = @json($auth->program?->others)
+            
+            $(document).ready(function () {
+                @if(old('template_letter_id') || $auth->program?->templateLetter?->id) 
+                    $('#template_letter_id').trigger('change');
+                @endif
+            })
+
             function addMediaSosial () {
                 let mediaSosialWrapper = $('#media-sosial-wrapper');
                 let mediaSosial = `
@@ -181,6 +206,93 @@
                     })
                 }
 
+            }
+
+            function handleChangeSelectTemplate(event) {
+                const $this = $(event.target);
+                const rootView = $('#utils-template-letter');
+
+                // set text on oldValue
+                $('input[name="template_letter_name"]').val($this.find('option:selected').text());
+                
+                if ($this.val()) {
+                    const route = '{{ route('admin.acara.template-undangan', ':id') }}'.replace(':id', $this.val());
+                    $.get(route, null, function (response) {
+                        const {data, message, status} = response;
+
+                        let html = '<table class="table table-striped mt-3">'
+                        $.each(data?.legends, function(index, value) {
+                            const valueLegend = others?.legends[value?.legend]
+
+                            if (value?.type == 'image') {
+                                html += `<tr><th>${value?.description}</th><td width="20" class="text-center">:</td><td>
+                                    <x-bootstrap-input data-name="${value?.legend}" placeholder="${value?.legend}" type="file" accept="image/*" onchange="saveImage(event)" />
+                                    <a href="{{ url('storage') }}/${valueLegend}" target="_blank" id="value_image_${value?.legend}" class="btn btn-primary btn-sm" style="${!valueLegend && 'display: none;'}">Lihat</a>
+                                    <input type="hidden" name="legend_${value?.legend}" data-name="${value?.legend}" value="${valueLegend}" class="legends_input">
+                                    </td></tr>`;
+                            } else {
+                                html += `<tr><th>${value?.description}</th><td width="20" class="text-center">:</td><td><x-bootstrap-input name="legend_${value?.legend}" data-name="${value?.legend}" class="legends_input" value="${valueLegend}" placeholder="${value?.legend}" type="${value?.type}" onchange="renderView()" /></td></tr>`;
+                            }
+                        })
+                        html += '</table>';
+
+                        rootView.html(html);
+
+                        window.letterId = $this.val();
+
+                        let url = '{{ route('admin.preview.html', ':id') }}?'.replace(':id', $this.val());
+                        rootView.append(`<embed src="${url}" id="preview-html-letter" class="w-100" height="1000"></embed>`)
+
+                        renderView();
+                    })
+                } else {
+                    rootView.html('');
+                }
+            }
+
+            function renderView() {
+                let url = '{{ route('admin.preview.html', ':id') }}?'.replace(':id', window.letterId ?? '');
+                $('.legends_input').each(function (index, value) {
+                    url += `${$(this).attr('data-name')}=${$(this).val() ?? $(this).attr('data-name')}&`;
+                })
+                $('#preview-html-letter').attr('src', url);
+            }
+
+            function saveImage(event) {
+                $('.data-errors').remove();
+                const $this = $(event.target);
+                const name = $this.attr('data-name');
+                const file = $this[0].files[0];
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('legend', name);
+
+                $.ajax({
+                    url: '{{ route('admin.acara.save-image') }}',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        const {data, message, status} = response;
+                        if (status) {
+                            $(`input[name="legend_${name}"]`).val(data?.path);
+                            console.log(data?.path);
+                            // $(`#value_image_${name}`).slideDown();
+                            // $(`#value_image_${name}`).attr('href', `{{ url('storage') }}/${data?.path}`);
+                            renderView();
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    error: function (err) {
+                        $(`input[name="legend_${name}"]`).val('');
+                        $(`input[name="legend_${name}"]`).after(`<div class="text-danger data-errors">${err?.responseJSON?.message}</div>`);
+                    }
+                })
             }
 
             if (iterationItem == 0) {

@@ -5,7 +5,7 @@ class Root {
             serverSide: true,
             language: {
                 noResults: "Data tidak ditemukan",
-                processing: "Loading ...", 
+                processing: "Loading ...",
                 search: "Mencari:",
             },
             ajax: {
@@ -18,11 +18,11 @@ class Root {
                 delay: 750,
             },
             columns: columns,
-            ...other            
-        })  
+            ...other
+        })
     }
 
-    select2Search ({element, url, placeholder = null, allowClear = true, multiple = false, results = 'name', dropdownParent = null}) {
+    select2Search ({element, url, placeholder = null, allowClear = true, multiple = false, results = 'text', dropdownParent = null, data = null}) {
         const result = results.split(',');
         $(element).select2({
             placeholder: placeholder,
@@ -36,19 +36,20 @@ class Root {
                 data: function(params) {
                     return {
                         search: params.term,
-                        page: params.page || 10
+                        page: params.page || 1,
+                        ...data
                     }
                 },
                 processResults: function(data, params) {
                     params.page = params.page || 10;
-    
+
                     const results = data.data.map(item => {
                         return {
                             id: item.id,
                             text: result.map(key => item[key]).join(' | ')
                         }
                     }) ?? [];
-    
+
                     return {
                         results: results,
                         pagination: {
@@ -59,6 +60,28 @@ class Root {
                 cache: true
             }
         });
+    }
+
+    api({url, method = 'GET', data}, callback) {
+        const form = {
+            url,
+            method,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                callback(response, true)
+            },
+            error: function (error) {
+                callback(error, false)
+            }
+        }
+
+        if (data) {
+            form.data = data
+        }
+
+        $.ajax(form)
     }
 }
 
