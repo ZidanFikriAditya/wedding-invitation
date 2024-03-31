@@ -16,9 +16,11 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-8 mb-3">
-
+            <div class="row justify-content-between">
+                <div class="col-md-4 mb-3">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="search">
+                    </div>
                 </div>
                 <div class="col-md-4 mb-3 text-end">
                     <a class="btn btn-primary" href="{{ route('admin.template-undangan.create') }}">
@@ -54,12 +56,28 @@
                         { data: 'title', name: 'title' },
                         { data: 'owner_name', name: 'owner.name' },
                         { data: 'action', name: 'action', searchable: false, orderable: false}
-                    ]
+                    ],
+                    searching: false,
+                    paging: false,
                 });
             });
 
+            let timeout;
+            $('#search').on('keyup', function () {
+                clearTimeout(timeout);
+
+                timeout = setTimeout(() => {
+                    console.log('searching');
+                    $('#table-letter-template').DataTable().search($(this).val()).draw();
+                }, 500);
+            });
+
             function handleDelete(id) {
-                
+                ZiApp.api({url: 'route("admin.template-undangan.destroy", ":id")'.replace(':id', id), method: 'delete'}, (res, status) => {
+                    if (status) {
+                        $('#table-letter-template').DataTable().ajax.reload();
+                    }
+                })
             }
         </script>
     </x-slot>

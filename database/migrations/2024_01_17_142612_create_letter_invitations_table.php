@@ -14,15 +14,9 @@ return new class extends Migration
         Schema::create('letter_invitations', function (Blueprint $table) {
             $table->id();
             $table->string('letter_number')->unique();
-            $table->string('subject');
             $table->foreignIdFor(\App\Models\Program::class, 'program_id')->constrained('programs')->cascadeOnDelete();
-            $table->foreignIdFor(\App\Models\TemplateLetter::class, 'template_letter_id')->constrained('template_letters')->cascadeOnDelete();
-            
-            $table->string('receiver_email');
-            $table->string('receiver_phone_number');
-            $table->string('receiver_name');
 
-            $table->json('legends')->nullable();
+            $table->string('receiver_name');
 
             $table->date('sent_at')->nullable();
             $table->enum('status', ['pending', 'sending', 'sended'])->default('pending');

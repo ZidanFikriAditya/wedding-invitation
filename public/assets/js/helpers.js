@@ -22,13 +22,14 @@ class Root {
         })
     }
 
-    select2Search ({element, url, placeholder = null, allowClear = true, multiple = false, results = 'text', dropdownParent = null, data = null}) {
+    select2Search ({element, url, placeholder = null, allowClear = true, multiple = false, results = 'text', dropdownParent = null, data = null, ...other}) {
         const result = results.split(',');
         $(element).select2({
             placeholder: placeholder,
             allowClear: allowClear,
             multiple: multiple,
             dropdownParent: dropdownParent,
+            other,
             ajax: {
                 url: url,
                 dataType: 'json',
