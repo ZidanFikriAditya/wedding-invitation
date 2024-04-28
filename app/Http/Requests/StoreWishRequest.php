@@ -22,7 +22,6 @@ class StoreWishRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'letter_invitation_id' => 'required|exists:letter_invitations,id',
             'wishes' => 'required|string',
             'other_people' => 'nullable|string',
             'confirmation' => 'required|in:datang,tidak datang',

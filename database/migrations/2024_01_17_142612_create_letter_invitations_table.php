@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Program::class, 'program_id')->constrained('programs')->cascadeOnDelete();
 
             $table->string('receiver_name');
+            $table->string('receiver_number');
 
             $table->date('sent_at')->nullable();
             $table->enum('status', ['pending', 'sending', 'sended'])->default('pending');

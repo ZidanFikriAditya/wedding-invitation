@@ -92,7 +92,7 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                        <x-bootstrap-input type="textarea" name="body_before" label="Convert Body" rows="10" id="body_before" placeholder="Body Converter..." />
+                        <x-bootstrap-input type="textarea" name="body" label="Convert Body" rows="10" id="body_before" placeholder="Body Converter..." :value="$model->body" />
                     </div>
 
                     <div class="col-md-12 mb-3">
@@ -100,7 +100,11 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                        <x-bootstrap-input type="textarea" name="body" label="Body Undangan" id="body" placeholder="Body..." required :value="(old('body') ?? $model->body)" />
+                        <div class="fw-bold text-dark">Preview Template</div>
+                        <div  id="preview-template">
+                            <embed src="{{ route('admin.preview.html',  md5("--$model->id--")) }}" id="preview-html-letter" class="w-100" height="1000"></embed>
+                        </div>
+                        <input type="hidden" name="is_click_generate_template">
                     </div>
 
 
@@ -121,24 +125,24 @@
             let indexLegend = {{ old('legends') ? count(old('legends')) : $model->legends->count() }}
             
             $(document).ready(() => {
-                $('#body').summernote({
-                    placeholder: 'Please write your letter here...',
-                    tabsize: 2,
-                    minHeight: 300
-                })
+                
             })
             
             function handleChangeSummernote() {
-                $('.note-editable').html('')
-
                 const contents = $('#body_before').val()
-                const replaceStorage = contents.replaceAll('{storage}', '{{ asset("storage/" . $model->uploadTemplateLetter->path_template) }}')
+                const replaceStorage = contents.replaceAll('{storage}', '{{ asset("storage/" . $model->uploadTemplateLetter->path_template) }}').trim()
                 
-                $('#body').summernote('code', replaceStorage)
-
                 showToast('success', 'Success generate letter template!')
 
-                $('#body_before').val('')
+                $.post('{{ route("admin.template.update-body",  md5("--$model->id--")) }}', {
+                    body: replaceStorage,
+                    _token: '{{ csrf_token() }}'
+                }, (response) => {
+                    let url = '{{ route('admin.preview.html',  md5("--$model->id--")) }}';
+                    $('#preview-template').html(`<embed src="${url}" id="preview-html-letter" class="w-100" height="1000"></embed>`)
+                })
+
+                $('#body_before').val(replaceStorage)
             }
 
             function addLegends() {

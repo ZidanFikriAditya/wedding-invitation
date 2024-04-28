@@ -228,7 +228,7 @@
                                 html += `<tr><th>${value?.description}</th><td width="20" class="text-center">:</td><td>
                                     <x-bootstrap-input data-name="${value?.legend}" placeholder="${value?.legend}" type="file" accept="image/*" onchange="saveImage(event)" />
                                     <a href="{{ url('storage') }}/${valueLegend}" target="_blank" id="value_image_${value?.legend}" class="btn btn-primary btn-sm" style="${!valueLegend && 'display: none;'}">Lihat</a>
-                                    <input type="hidden" name="legend_${value?.legend}" data-name="${value?.legend}" value="${valueLegend}" class="legends_input">
+                                    <input type="hidden" name="legend_${value?.legend}" data-name="${value?.legend}" value="${valueLegend ?? null}" class="legends_input">
                                     </td></tr>`;
                             } else {
                                 html += `<tr><th>${value?.description}</th><td width="20" class="text-center">:</td><td><x-bootstrap-input name="legend_${value?.legend}" data-name="${value?.legend}" class="legends_input" value="${valueLegend}" placeholder="${value?.legend}" type="${value?.type}" onchange="renderView()" /></td></tr>`;

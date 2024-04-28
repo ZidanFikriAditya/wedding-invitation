@@ -19,5 +19,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/wishes', [WishController::class, 'index']);
-Route::post('/wishes', [WishController::class, 'store']);
+Route::get('/wishes/{id}', [WishController::class, 'index']);
+Route::post('/wishes/{id}', [WishController::class, 'store']);

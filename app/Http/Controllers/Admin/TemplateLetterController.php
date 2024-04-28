@@ -244,4 +244,16 @@ class TemplateLetterController extends Controller
 
         return ResponsePaginate::collection($model);
     }
+
+    public function updateBody(Request $request, $id)
+    {
+        $model = model::query()
+            ->whereRaw('MD5(CONCAT("--", id, "--")) = ?', $id)
+            ->firstOrFail();
+
+        $model->body = $request->body;
+        $model->save();
+
+        return response()->json(['message' => 'Data berhasil diubah']);
+    }
 }

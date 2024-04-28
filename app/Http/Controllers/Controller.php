@@ -19,7 +19,7 @@ class Controller extends BaseController
         ], $status);
     }
 
-    public function responseMessage($message, $status = 400)
+    public function responseMessage($message, $status = 200)
     {
         return response()->json([
             'status' => $status,

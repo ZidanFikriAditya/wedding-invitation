@@ -26,9 +26,10 @@ class ProgramController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'type_medsos.*' => 'required|string',
-            'social_media.*' => 'required|string',
+            'type_medsos.*' => 'string',
+            'social_media.*' => 'string',
         ]);
+        
 
         $user = Auth::user();
 
@@ -53,7 +54,7 @@ class ProgramController extends Controller
                     ->first();
     
                 $medsos = [];
-                foreach ($request->type_medsos as $key => $type) {
+                foreach ($request->type_medsos ?? [] as $key => $type) {
                     $medsos[$type] = $request->social_media[$key];
                 }
     
@@ -67,7 +68,7 @@ class ProgramController extends Controller
                 ]);
             } else {
                 $medsos = [];
-                foreach ($request->type_medsos as $key => $type) {
+                foreach ($request->type_medsos ?? [] as $key => $type) {
                     $medsos[$type] = $request->social_media[$key];
                 }
     
@@ -82,12 +83,16 @@ class ProgramController extends Controller
                 ]);
             }
 
-            $htmlReplace = $templateLetter->body;
+            $htmlReplace = $templateLetter?->body;
             $legendsValue['legends'] = [];
             foreach ($templateLetter?->legends ?? [] as $legend) {
                 $legendValue = $request->input('legend_' . $legend->legend);
                 $legendsValue['legends'][$legend->legend] = $legendValue;
-                $htmlReplace = str_replace($legend->legend, $legendValue, $templateLetter->body);
+                $explodePoint = explode('.', $legendValue);
+                if (isset($explodePoint[1]) && in_array($explodePoint[1], ['png', 'jpg', 'jpeg', 'webp', 'svg'])) {
+                    $legendValue = url('storage') . '/' . $legendValue;
+                }
+                $htmlReplace = str_replace($legend->legend, $legendValue, $templateLetter?->body);
             }
             $program->others = $legendsValue;
             $program->current_template_letter = $htmlReplace;
@@ -97,7 +102,7 @@ class ProgramController extends Controller
             return redirect()->back()->with('success', 'Berhasil mengubah acara');
         } catch (\Throwable $th) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Gagal membuat acara baru');
+            return redirect()->back()->withInput()->with('error', 'Gagal membuat acara baru: ' . $th->getMessage());
         }
     }
 
@@ -129,8 +134,15 @@ class ProgramController extends Controller
 
         foreach ($model->legends as $legend) {
             $legendValue = $request->input($legend->legend);
+            $explodePoint = explode('.', $legendValue);
+            if (isset($explodePoint[1]) && in_array($explodePoint[1], ['png', 'jpg', 'jpeg', 'webp', 'svg'])) {
+                $legendValue = url('storage') . '/' . $legendValue;
+            }
             $model->body = str_replace($legend->legend, $legendValue ?? $legend->legend, $model->body);
         }
+
+        Auth::user()->program->current_template_letter = $model->body;
+        Auth::user()->program->save();
 
         return view('admin.preview', compact('model'));
     }
@@ -138,7 +150,7 @@ class ProgramController extends Controller
     public function saveImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'legend' => 'required|string',
         ]);
 
@@ -152,14 +164,14 @@ class ProgramController extends Controller
             } catch (\Throwable $th) {}
 
             $image = $request->file('image');
-            $imageName = $request->legend . '_' . time() . '.' . $image->extension();
+            $imageName = 'IMG_' . time() . '.' . $image->extension();
             $path = 'images_legend/' . $imageName;
             Storage::disk('public')->put($path, file_get_contents($image));
 
             $legendsValue[$request->legend] = $path;
         } else {
             $image = $request->file('image');
-            $imageName = $request->legend . '_' . time() . '.' . $image->extension();
+            $imageName = 'IMG_' . time() . '.' . $image->extension();
             $path = 'images_legend/' . $imageName;
             Storage::disk('public')->put($path, file_get_contents($image));
             $legendsValue = [
@@ -168,6 +180,8 @@ class ProgramController extends Controller
         }
 
         $program->others = ['legends' => $legendsValue];
+        $currentTemplateLetter = str_replace($request->legend, url('storage') . '/' . $path, $program->templateLetter?->body);
+        $program->current_template_letter = $currentTemplateLetter;
         $program->save();
 
         return $this->responseData([

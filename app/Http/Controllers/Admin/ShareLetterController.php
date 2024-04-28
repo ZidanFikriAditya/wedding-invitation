@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\LetterInvitationImport;
+use App\Models\LetterInvitation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ShareLetterController extends Controller
 {
@@ -15,20 +19,72 @@ class ShareLetterController extends Controller
         return view('admin.invitation.index');
     }
 
+    public function data()
+    {
+        $model = LetterInvitation::query()
+            ->where('program_id', Auth::user()->program?->id);
+
+        return datatables($model)
+            ->addIndexColumn()
+            ->editColumn('id', function ($model) {
+                return md5("--$model->id--");
+            })
+            ->addColumn('action', function ($model) {
+
+                return "
+                    <a href='javascript:;' data-bs-toggle='modal' data-bs-target='#modal-edit-invitation' data-id='". cryptId($model->id) ."' class='btn btn-sm btn-warning'><i class='ti ti-pencil'></i></a>
+                    <a href='javascript:;' class='btn btn-sm btn-danger' onclick='handleDelete(\"" . md5("--$model->id--") . "\")'><i class='ti ti-trash'></i></a>
+                    <a target='blank' href='". route('admin.undangan.sent-status', ['id' => cryptId($model->id), 'status' => 'sending']) ."' class='btn btn-sm btn-primary'><i class='ti ti-share'></i></a>
+                ";
+            })
+            ->rawColumns(['action'])
+            ->toJson();
+    }
+
+    public function show($id)
+    {
+        $id = decryptId($id);
+
+        $model = LetterInvitation::query()->findOrFail($id, ['receiver_name', 'receiver_number']);
+
+        $view = view('admin.invitation.show', compact('model'))->render();
+
+        return $this->responseData($view, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
-    }
+        $this->validate($request, [
+            'name' => 'required|array',
+            'name.*' => 'required|string',
+            'number' => 'required|array',
+            'number.*' => 'required|string',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        try {
+            $program = Auth::user()->program;
+
+            if (!$program) {
+                throw new \Exception('Harap isi data program terlebih dahulu');
+            }
+
+            foreach ($request->name as $key => $name) {
+                $model = new LetterInvitation();
+                $model->letter_number = 'LI_' . date('mY') . '_' . str_pad(LetterInvitation::count() + 1, 4, '0', STR_PAD_LEFT);
+                $model->receiver_name = $name;
+                $model->receiver_number = $request->number[$key];
+                $model->program_id = $program->id;
+                $model->save();
+            }
+    
+            return $this->responseMessage('Berhasil menambahkan data', 201);
+        } catch (\Throwable $th) {
+            return $this->responseMessage($th->getMessage(), 500);
+        }
+
     }
 
     /**
@@ -36,7 +92,19 @@ class ShareLetterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required',
+            'number' => 'required',
+        ]);
+
+        $id = decryptId($id);
+
+        $model = LetterInvitation::findOrFail($id);
+        $model->receiver_name = $request->name;
+        $model->receiver_number = $request->number;
+        $model->save();
+
+        return $this->responseMessage('Berhasil mengubah data');
     }
 
     /**
@@ -44,6 +112,41 @@ class ShareLetterController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $model = LetterInvitation::whereCrypt('id', $id)->firstOrFail();
+        $model->delete();
+
+        return $this->responseMessage('Berhasil menghapus data');
+    }
+
+    public function importExcel(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        $file = $request->file('file');
+
+        if (!auth()->user()->program) {
+            return $this->responseMessage('Harap isi data program terlebih dahulu', 500);
+        }
+
+        $import = Excel::import(new LetterInvitationImport(auth()->user()->program->id), $file);
+
+        return $this->responseMessage('Berhasil mengimport data');
+    }
+
+    public function sentStatus (Request $request, $id)
+    {
+        $id = decryptId($id);
+
+        $model = LetterInvitation::findOrFail($id);
+        $model->status = $request->status;
+        $model->sent_at = now();
+        $model->save();
+
+        $urlEncode = 'Hai ' . $model->receiver_name . ', Tolong Klik link ini untuk melihat undangan '  . urlencode(route('preview', cryptId($model->id)));
+        $phoneNumber = substr($model->receiver_number, 0, 1) == '0' ? '62' . substr($model->receiver_number, 1) : (substr($model->receiver_number, 0, 2) == '62' ? $model->receiver_number : '62' . $model->receiver_number);
+
+        return redirect("https://api.whatsapp.com/send?phone=". $phoneNumber ."&text=".$urlEncode."");
     }
 }

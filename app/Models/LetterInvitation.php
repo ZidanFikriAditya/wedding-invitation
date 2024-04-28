@@ -13,11 +13,7 @@ class LetterInvitation extends Model
         'letter_number',
         'subject',
         'program_id',
-        'template_letter_id',
-        'receiver_email',
         'receiver_name',
-        'receiver_phone_number',
-        'legends',
         'sent_at',
         'status'
     ];

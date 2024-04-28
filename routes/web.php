@@ -44,6 +44,8 @@ Route::group([
     Route::post('template-undangan-data/data-table', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'data'])->name('template-undangan.data');
     Route::post('template-undangan-upload', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'uploadTemplateLetter'])->name('template-undangan-upload');
     Route::resource('undangan', \App\Http\Controllers\Admin\ShareLetterController::class);
+    Route::post('undangan/data-table', [\App\Http\Controllers\Admin\ShareLetterController::class, 'data'])->name('undangan.data');
+    Route::get('undangan-share/{id}', [\App\Http\Controllers\Admin\ShareLetterController::class, 'sentStatus'])->name('undangan.sent-status');
     Route::resource('acara', \App\Http\Controllers\Admin\ProgramController::class)->only(['index', 'store']);
 
     Route::get('acara/{undangan}/undangan', [\App\Http\Controllers\Admin\ProgramController::class, 'templateLetterUtils'])->name('acara.template-undangan');
@@ -51,6 +53,10 @@ Route::group([
     Route::post('acara/save-image', [\App\Http\Controllers\Admin\ProgramController::class, 'saveImage'])->name('acara.save-image');
     Route::get('preview/html/{undangan}', [\App\Http\Controllers\Admin\ProgramController::class, 'previewHtml'])->name('preview.html');
 
+    Route::post('template/update-body/{id}', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'updateBody'])->name('template.update-body');
+
 });
+
+Route::get('preview/{undangan}', [\App\Http\Controllers\PreviewController::class, 'preview'])->name('preview');
 
 require __DIR__.'/auth.php';
