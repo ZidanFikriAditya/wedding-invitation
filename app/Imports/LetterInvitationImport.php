@@ -15,7 +15,7 @@ class LetterInvitationImport implements ToCollection
     */
     public function collection(Collection $collection)
     {
-        $collection->chunk(50, function ($rows, $key) {
+        $collection->each(function ($rows, $key) {
             if ($key == 0) {
                 return;
             }

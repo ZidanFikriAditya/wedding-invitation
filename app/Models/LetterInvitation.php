@@ -22,6 +22,16 @@ class LetterInvitation extends Model
         'legends' => 'array'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $number = LetterInvitation::latest()->first()?->letter_number;
+            $model->letter_number = 'LI_' . date('mY') . '_' . str_pad(($number ? (int) substr($number, 10) : 0) + 1, 4, '0', STR_PAD_LEFT);
+        });
+    }
+
     public function program()
     {
         return $this->belongsTo(Program::class);

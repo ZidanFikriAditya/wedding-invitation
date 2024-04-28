@@ -45,6 +45,7 @@ Route::group([
     Route::post('template-undangan-upload', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'uploadTemplateLetter'])->name('template-undangan-upload');
     Route::resource('undangan', \App\Http\Controllers\Admin\ShareLetterController::class);
     Route::post('undangan/data-table', [\App\Http\Controllers\Admin\ShareLetterController::class, 'data'])->name('undangan.data');
+    Route::post('import-undangan', [\App\Http\Controllers\Admin\ShareLetterController::class, 'importExcel'])->name('import-undangan');
     Route::get('undangan-share/{id}', [\App\Http\Controllers\Admin\ShareLetterController::class, 'sentStatus'])->name('undangan.sent-status');
     Route::resource('acara', \App\Http\Controllers\Admin\ProgramController::class)->only(['index', 'store']);
 

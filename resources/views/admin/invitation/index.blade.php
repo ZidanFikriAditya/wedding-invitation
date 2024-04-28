@@ -47,24 +47,26 @@
     <div class="modal fade" id="modal-import-excel" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Import Excel</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="row">
-                <div class="col-12 mb-3">
-                    <button class="btn btn-success"><i class="ti ti-file"></i> Download Format</button>
-                </div>
-                <div class="col-12">
-                    <x-bootstrap-input name="file" placeholder="Deskripsi..." type="file" label="Excel File" />
+        <form onsubmit="handleImportExcel(event)">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <a class="btn btn-success" href="{{ asset('/assets/examples/Import - Invitation.xlsx') }}"><i class="ti ti-file"></i> Download Format</a>
+                    </div>
+                    <div class="col-12">
+                        <x-bootstrap-input name="file" placeholder="Deskripsi..." type="file" label="Excel File" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </form>
         </div>
     </div>
     </div>
@@ -115,6 +117,24 @@
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" onclick="submitInvitation('edit')">Save changes</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="modal-delete-invitation" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Hapus Undangan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Apakah anda yakin ingin menghapus undangan ini?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <button type="button" class="btn btn-danget" onclick="deleteInvitation()">Hapus</button>
         </div>
         </div>
     </div>
@@ -241,6 +261,62 @@
                 alert.find('span').html('&nbsp;' + message);
 
                 alert.fadeIn();
+            }
+
+            function handleImportExcel(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                $.ajax({
+                    url: '{{ route('admin.import-undangan') }}',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status == 201 || response.status == 200) {
+                            showAlert(response.message, 'success');
+                        } else {
+                            showAlert(response.message, 'error');                            
+                        }
+
+                        $(e.target).trigger('reset');
+                        $('#modal-import-excel').modal('hide');
+                        window.table.ajax.reload();
+                    },
+                    error: function(error) {
+                        showAlert(error.responseJSON.message, 'error');
+                    }
+                })
+            }
+
+            function deleteInvitation() {
+                $.ajax({
+                    url: '{{ route('admin.undangan.destroy', ':id') }}'.replace(':id', window.idInvitation),
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.status == 201 || response.status == 200) {
+                            showAlert(response.message, 'success');
+                        } else {
+                            showAlert(response.message, 'error');                            
+                        }
+
+                        $('#modal-delete-invitation').modal('hide');
+                        window.table.ajax.reload();
+                    },
+                    error: function(error) {
+                        showAlert(error.responseJSON.message, 'error');
+                    }
+                })
+            }
+
+            function handleDelete(id) {
+                window.idInvitation = id;
+                $('#modal-delete-invitation').modal('show');
             }
 
             addInvitations();

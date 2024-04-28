@@ -33,7 +33,7 @@ class ShareLetterController extends Controller
 
                 return "
                     <a href='javascript:;' data-bs-toggle='modal' data-bs-target='#modal-edit-invitation' data-id='". cryptId($model->id) ."' class='btn btn-sm btn-warning'><i class='ti ti-pencil'></i></a>
-                    <a href='javascript:;' class='btn btn-sm btn-danger' onclick='handleDelete(\"" . md5("--$model->id--") . "\")'><i class='ti ti-trash'></i></a>
+                    <a href='javascript:;' class='btn btn-sm btn-danger' onclick='handleDelete(\"" . cryptId($model->id) . "\")'><i class='ti ti-trash'></i></a>
                     <a target='blank' href='". route('admin.undangan.sent-status', ['id' => cryptId($model->id), 'status' => 'sending']) ."' class='btn btn-sm btn-primary'><i class='ti ti-share'></i></a>
                 ";
             })
@@ -73,7 +73,6 @@ class ShareLetterController extends Controller
 
             foreach ($request->name as $key => $name) {
                 $model = new LetterInvitation();
-                $model->letter_number = 'LI_' . date('mY') . '_' . str_pad(LetterInvitation::count() + 1, 4, '0', STR_PAD_LEFT);
                 $model->receiver_name = $name;
                 $model->receiver_number = $request->number[$key];
                 $model->program_id = $program->id;
@@ -112,7 +111,8 @@ class ShareLetterController extends Controller
      */
     public function destroy(string $id)
     {
-        $model = LetterInvitation::whereCrypt('id', $id)->firstOrFail();
+        $id = decryptId($id);
+        $model = LetterInvitation::where('id', $id)->firstOrFail();
         $model->delete();
 
         return $this->responseMessage('Berhasil menghapus data');
@@ -130,7 +130,7 @@ class ShareLetterController extends Controller
             return $this->responseMessage('Harap isi data program terlebih dahulu', 500);
         }
 
-        $import = Excel::import(new LetterInvitationImport(auth()->user()->program->id), $file);
+        Excel::import(new LetterInvitationImport(auth()->user()->program->id), $file);
 
         return $this->responseMessage('Berhasil mengimport data');
     }
