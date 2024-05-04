@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Wish;
 use App\Http\Requests\StoreWishRequest;
 use App\Http\Requests\UpdateWishRequest;
+use App\Models\LetterInvitation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,10 +17,13 @@ class WishController extends Controller
     public function index($id)
     {
         $id = decryptId($id);
+
+        $letterInvitation = LetterInvitation::findOrFail($id);
+
         $get_all_wishes = DB::table('wishes')
             ->join('letter_invitations', 'wishes.letter_invitation_id', '=', 'letter_invitations.id')
             ->select('wishes.*', 'letter_invitations.receiver_name as name')
-            ->where('letter_invitations.program_id', $id)
+            ->where('letter_invitations.program_id', $letterInvitation->program_id)
             ->get()
             ->map(function ($item) {
                 $item->name = $item->name . ($item->other_people ? ' & ' . $item->other_people : '');

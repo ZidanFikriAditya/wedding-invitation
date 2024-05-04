@@ -105,7 +105,6 @@ class TemplateLetterController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string',
-            'body' => 'required|string',
             'legends' => 'nullable|array',
             'legends.*' => 'required|string',
             'upload_zip' => 'nullable|file|mimes:zip|max:10240',
@@ -113,8 +112,6 @@ class TemplateLetterController extends Controller
             'legend_name.*' => 'required|string',
             'legend_type.*' => 'required|string',
         ]);
-
-        $validated['body'] = trim(str_replace(url("storage/template-undangan"), '{storage}', $validated['body']));
 
         DB::beginTransaction();
         try {
@@ -247,11 +244,14 @@ class TemplateLetterController extends Controller
 
     public function updateBody(Request $request, $id)
     {
+        $base65Decode = base64_decode($request->body);
+
         $model = model::query()
             ->whereRaw('MD5(CONCAT("--", id, "--")) = ?', $id)
             ->firstOrFail();
 
-        $model->body = $request->body;
+
+        $model->body = $base65Decode;
         $model->save();
 
         return response()->json(['message' => 'Data berhasil diubah']);

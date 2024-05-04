@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return abort(404);
+    return redirect()->route('login');
 });
 
 Route::middleware('auth')->group(function () {
@@ -60,6 +60,6 @@ Route::group([
     Route::post('doa/{id}', [\App\Http\Controllers\Admin\WishController::class, 'destroy'])->name('doa.destroy');
 });
 
-Route::get('preview/{undangan}', [\App\Http\Controllers\PreviewController::class, 'preview'])->name('preview');
+Route::get('/{id}/{undangan}', [\App\Http\Controllers\PreviewController::class, 'preview'])->name('preview');
 
 require __DIR__.'/auth.php';

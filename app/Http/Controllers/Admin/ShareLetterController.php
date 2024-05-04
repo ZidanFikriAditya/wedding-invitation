@@ -144,7 +144,7 @@ class ShareLetterController extends Controller
         $model->sent_at = now();
         $model->save();
 
-        $urlEncode = 'Hai ' . $model->receiver_name . ', Tolong Klik link ini untuk melihat undangan '  . urlencode(route('preview', cryptId($model->id)));
+        $urlEncode = 'Hai ' . $model->receiver_name . ', Tolong Klik link ini untuk melihat undangan '  . urlencode(route('preview', ['id' => $model->program_id, 'undangan' => $model->receiver_number]));
         $phoneNumber = substr($model->receiver_number, 0, 1) == '0' ? '62' . substr($model->receiver_number, 1) : (substr($model->receiver_number, 0, 2) == '62' ? $model->receiver_number : '62' . $model->receiver_number);
 
         return redirect("https://api.whatsapp.com/send?phone=". $phoneNumber ."&text=".$urlEncode."");

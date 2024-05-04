@@ -92,7 +92,7 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                        <x-bootstrap-input type="textarea" name="body" label="Convert Body" rows="10" id="body_before" placeholder="Body Converter..." :value="$model->body" />
+                        <x-bootstrap-input type="textarea" label="Convert Body" rows="10" id="body_before" placeholder="Body Converter..." :value="$model->body" />
                     </div>
 
                     <div class="col-md-12 mb-3">
@@ -117,6 +117,7 @@
     </div>
 
     <x-slot name="scripts">
+        <script src="/assets/js/base64.js"></script>
         <script>
             @if (session('success'))
                 showToast('success', '{{ session('success') }}')
@@ -127,15 +128,17 @@
             $(document).ready(() => {
                 
             })
-            
+
             function handleChangeSummernote() {
                 const contents = $('#body_before').val()
                 const replaceStorage = contents.replaceAll('{storage}', '{{ asset("storage/" . $model->uploadTemplateLetter->path_template) }}').trim()
                 
+                const base64 = Base64.encode(replaceStorage)
+
                 showToast('success', 'Success generate letter template!')
 
                 $.post('{{ route("admin.template.update-body",  md5("--$model->id--")) }}', {
-                    body: replaceStorage,
+                    body: base64,
                     _token: '{{ csrf_token() }}'
                 }, (response) => {
                     let url = '{{ route('admin.preview.html',  md5("--$model->id--")) }}';
