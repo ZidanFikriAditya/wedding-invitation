@@ -20,7 +20,11 @@ class WishController extends Controller
             ->join('letter_invitations', 'wishes.letter_invitation_id', '=', 'letter_invitations.id')
             ->select('wishes.*', 'letter_invitations.receiver_name as name')
             ->where('letter_invitations.program_id', $id)
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $item->name = $item->name . ($item->other_people ? ' & ' . $item->other_people : '');
+                return $item;
+            });
             
         return response()->json([
             'status_code' => 200,

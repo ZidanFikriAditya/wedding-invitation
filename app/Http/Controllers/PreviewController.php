@@ -27,7 +27,7 @@ class PreviewController extends Controller
         //         }
         //     }
         // }
-        $data = str_replace(['{to}', '{url_wishes}'], [$letter_invitation->receiver_name, url('api/wishes') .'/' . cryptId($letter_invitation->id)], $letter_invitation->program->current_template_letter);
+        $data = str_replace(['{to}', '{url_wishes}'], [$letter_invitation->receiver_name, url('api/wishes') .'/' . cryptId($letter_invitation->program_id)], $letter_invitation->program->current_template_letter);
         // echo $program->current_template_letter;
 
         echo $data;

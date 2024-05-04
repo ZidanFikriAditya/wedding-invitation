@@ -37,8 +37,8 @@ class TemplateLetterController extends Controller
             })
             ->addColumn('action', function ($model) {
                 return "
-                    <a href='".route('admin.template-undangan.show', md5("--$model->id--"))."' class='btn btn-sm btn-warning'>Edit</a>
-                    <a href='javascript:;' class='btn btn-sm btn-danger' onclick='handleDelete(\"" . md5("--$model->id--") . "\")'>Hapus</a>
+                    <a href='".route('admin.template-undangan.show', md5("--$model->id--"))."' class='btn btn-sm btn-warning'><i class='ti ti-pencil'></i></a>
+                    <a href='javascript:;' class='btn btn-sm btn-danger' onclick='handleDelete(\"" . md5("--$model->id--") . "\")'><i class='ti ti-trash'></i></a>
                     ";
             })
             ->rawColumns(['action'])

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,9 +30,7 @@ Route::group([
     'middleware' => ['role:superadmin,admin'],
     'as' => 'admin.'
 ], function () {
-    Route::get('/', function () {
-        return view('admin.index');
-    })->name('index');
+    Route::get('/', [HomeController::class, 'index'])->name('index');
 
     Route::group([
         'prefix' => 'select2',
@@ -56,6 +55,9 @@ Route::group([
 
     Route::post('template/update-body/{id}', [\App\Http\Controllers\Admin\TemplateLetterController::class, 'updateBody'])->name('template.update-body');
 
+    Route::get('doa', [\App\Http\Controllers\Admin\WishController::class, 'index'])->name('doa.index');
+    Route::get('doa/{id}', [\App\Http\Controllers\Admin\WishController::class, 'show'])->name('doa.show');
+    Route::post('doa/{id}', [\App\Http\Controllers\Admin\WishController::class, 'destroy'])->name('doa.destroy');
 });
 
 Route::get('preview/{undangan}', [\App\Http\Controllers\PreviewController::class, 'preview'])->name('preview');

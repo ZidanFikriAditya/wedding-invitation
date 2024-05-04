@@ -57,6 +57,14 @@
               <span class="hide-menu">Undangan</span>
             </a>
           </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link {{ Request::is('admin/doa*') ? 'active' : '' }}" href="{{ route('admin.doa.index') }}" aria-expanded="false">
+              <span>
+                <i class="ti ti-file-plus"></i>
+              </span>
+              <span class="hide-menu">Doa</span>
+            </a>
+          </li>
       </nav>
       <!-- End Sidebar navigation -->
     </div>
