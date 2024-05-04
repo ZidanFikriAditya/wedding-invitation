@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect('/login');
+    return abort(404);
 });
 
 Route::middleware('auth')->group(function () {
