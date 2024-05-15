@@ -13,6 +13,10 @@
         ]
     ]"></x-slot>
 
+    <x-slot name="styles">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.css" />
+    </x-slot>
+
     <x-slot name="title">
         Edit New Template
     </x-slot>
@@ -92,7 +96,7 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                        <x-bootstrap-input type="textarea" label="Convert Body" rows="10" id="body_before" placeholder="Body Converter..." :value="$model->body" />
+                        <x-bootstrap-input type="textarea" label="Convert Body" rows="20" id="body_before" placeholder="Body Converter..." :value="$model->body" />
                     </div>
 
                     <div class="col-md-12 mb-3">
@@ -117,8 +121,25 @@
     </div>
 
     <x-slot name="scripts">
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/xml/xml.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/css/css.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/javascript/javascript.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/htmlmixed/htmlmixed.js'></script>
         <script src="/assets/js/base64.js"></script>
-        <script>
+        <script id="rendered-js">
+            const editor = CodeMirror.fromTextArea(document.getElementById("body_before"), {
+                styleActiveLine: true,
+                lineNumbers: true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                autoCloseTags: true,
+                theme: "dracula",
+                mode: "htmlmixed",
+            });
+
+            editor.setSize('100%', 600)
+
             @if (session('success'))
                 showToast('success', '{{ session('success') }}')
             @endif
@@ -130,7 +151,7 @@
             })
 
             function handleChangeSummernote() {
-                const contents = $('#body_before').val()
+                const contents = editor.getValue()
                 const replaceStorage = contents.replaceAll('{storage}', '{{ asset("storage/" . $model->uploadTemplateLetter->path_template) }}').trim()
                 
                 const base64 = Base64.encode(replaceStorage)
