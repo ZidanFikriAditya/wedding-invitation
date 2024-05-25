@@ -19,10 +19,12 @@ class LetterInvitationImport implements ToCollection
             if ($key == 0) {
                 return;
             }
+            
+            $receiver_number = str_replace([' ', '-', '+'], ['', '', ''], $rows[1]);
 
             $checkHas = LetterInvitation::query()
                 ->where('program_id', $this->programId)
-                ->whereIn('receiver_number', $rows->pluck(1))
+                ->whereIn('receiver_number', [$receiver_number])
                 ->first();
 
             if ($checkHas) {
@@ -34,8 +36,6 @@ class LetterInvitationImport implements ToCollection
             if (empty($rows[0]) || empty($rows[1])) {
                 return;
             }
-
-            $receiver_number = str_replace([' ', '-', '+'], ['', '', ''], $rows[1]);
 
             $model = new LetterInvitation();
             $model->program_id = $this->programId;
