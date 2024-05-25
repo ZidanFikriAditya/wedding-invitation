@@ -72,11 +72,25 @@ class ShareLetterController extends Controller
             }
 
             foreach ($request->name as $key => $name) {
-                $model = new LetterInvitation();
-                $model->receiver_name = $name;
-                $model->receiver_number = $request->number[$key];
-                $model->program_id = $program->id;
-                $model->save();
+                $receiver_number = str_replace([' ', '-', '+'], ['', '', ''], $request->number[$key]);
+
+                $checkHas = LetterInvitation::query()
+                    ->where('program_id', $program->id)
+                    ->whereIn('receiver_number', [$receiver_number])
+                    ->first();
+
+                if ($checkHas) {
+                    $checkHas->receiver_name = $name;
+                    $checkHas->receiver_number = $receiver_number;
+                    $checkHas->save();
+                } else {
+                    $model = new LetterInvitation();
+                    $model->receiver_name = $name;
+                    $model->receiver_number = $receiver_number;
+                    $model->program_id = $program->id;
+                    $model->save();
+                }
+
             }
     
             return $this->responseMessage('Berhasil menambahkan data', 201);
@@ -97,10 +111,12 @@ class ShareLetterController extends Controller
         ]);
 
         $id = decryptId($id);
+        
+        $receiver_number = str_replace([' ', '-', '+'], ['', '', ''], $request->number);
 
         $model = LetterInvitation::findOrFail($id);
         $model->receiver_name = $request->name;
-        $model->receiver_number = $request->number;
+        $model->receiver_number = $receiver_number;
         $model->save();
 
         return $this->responseMessage('Berhasil mengubah data');
