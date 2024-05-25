@@ -31,6 +31,10 @@ class LetterInvitationImport implements ToCollection
                 return;
             }
 
+            if (empty($rows[0]) || empty($rows[1])) {
+                return;
+            }
+
             $model = new LetterInvitation();
             $model->program_id = $this->programId;
             $model->receiver_name = $rows[0];
