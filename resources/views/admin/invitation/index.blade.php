@@ -345,7 +345,7 @@
                     window.open(e.currentTarget.getAttribute('href'), '_blank');
                 } else {
                     $('#modal-alert-double').modal('show');
-                    $('#modal-alert-double .modal-footer').find('.btn-success').attr('onclick', `window.open('${e.currentTarget.getAttribute('href')}'', '_blank');`);
+                    $('#modal-alert-double .modal-footer').find('.btn-success').attr('onclick', `window.open('${e.currentTarget.getAttribute('href')}', '_blank');`);
                 }
                 
                 setTimeout(() => {
