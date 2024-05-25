@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class LetterInvitation extends Model
 {
@@ -28,7 +29,11 @@ class LetterInvitation extends Model
 
         static::creating(function ($model) {
             $number = LetterInvitation::latest()->first()?->letter_number;
-            $model->letter_number = 'LI_' . date('mY') . '_' . str_pad(($number ? (int) substr($number, 9) : 0) + 1, 4, '0', STR_PAD_LEFT);
+            Log::info([
+                'number' => substr($number, 10),
+                'number_int' => (int) substr($number, 10),
+            ]);
+            $model->letter_number = 'LI_' . date('mY') . '_' . str_pad(($number ? (int) substr($number, 10) : 0) + 1, 4, '0', STR_PAD_LEFT);
         });
     }
 
