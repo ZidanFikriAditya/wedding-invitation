@@ -139,19 +139,19 @@
     </div>
     </div>
     
-    <div class="modal fade" id="modal-alert-al" tabindex="-1">
+    <div class="modal fade" id="modal-alert-double" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Hapus Undangan</h5>
+            <h5 class="modal-title">Confirmation</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <p>Apakah anda yakin ingin menghapus undangan ini?</p>
+            <p>Anda sudah mengirim undangan ini, apakah anda ingin mengirim ulang?</p>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            <button type="button" class="btn btn-danget" onclick="deleteInvitation()">Hapus</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-success" onclick="">Kirim</button>
         </div>
         </div>
     </div>
@@ -339,8 +339,19 @@
 
             function handleSendingInv(e) {
                 e.preventDefault();
+                const status = e.currentTarget.getAttribute('data-status');
 
-                window.open(e.currentTarget.getAttribute('href'), '_blank');
+                if (status == 'pending') {
+                    window.open(e.currentTarget.getAttribute('href'), '_blank');
+                } else {
+                    $('#modal-alert-double').modal('show');
+                    $('#modal-alert-double .modal-footer').find('.btn-success').attr('onclick', `window.open(${e.currentTarget.getAttribute('href')}, '_blank');`);
+                }
+                
+                setTimeout(() => {
+                    window.table.ajax.reload();
+                }, 500);
+                return;
             }
 
             addInvitations();
