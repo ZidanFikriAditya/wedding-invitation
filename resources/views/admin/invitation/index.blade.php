@@ -158,6 +158,7 @@
                     columns: [
                         { data: 'letter_number', name: 'letter_number' },
                         { data: 'receiver_name', name: 'receiver_name' },
+                        { data: 'receiver_number', name: 'receiver_number' },
                         { data: 'status', name: 'status' },
                         { data: 'action', name: 'action' }
                     ]
