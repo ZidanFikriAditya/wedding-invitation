@@ -163,16 +163,14 @@ class ShareLetterController extends Controller
 
         $link = urlencode(route('preview', ['id' => $model->program_id, 'undangan' => $model->receiver_number]));
 
-        $urlEncode = 'Assalamualaikum Warahmatullahi Wabarakatuh' . "%0D%0A";
-        $urlEncode .= 'Dengan memohon rahmat dan ridho Allah SWT. kami bermaksud mengundang Bapak/Ibu/Saudara/i '. $model->receiver_name .' untuk hadir dalam acara pernikahan kami.' . "%0D%0A";
-        $urlEncode .= 'Untuk Info Detail Acara, Lokasi, dan Waktu Lebih Lengkap bisa akses link undangan online berikut : ' . "%0D%0A";
-        $urlEncode .= $link . "%0D%0A";
-        $urlEncode .= 'Merupakan Suatu Kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu di acara pernikahan kami. ' . "%0D%0A";
-        $urlEncode .= 'Karena keterbatasan jarak dan waktu tidak dapat mengirimkan undangan ini secara langsung, maka melalui undangan online ini dapat menjadi pengganti undangan resmi sehingga tujuan kami tersampaikan.' . "%0D%0A";
-        $urlEncode .= 'Wassallamualaikum Warahmatullahi Wabarakatuh' . "%0D%0A";
+        $urlEncode = 'Assalamualaikum Warahmatullahi Wabarakatuh' . "%0D%0A%0D%0A";
+        $urlEncode .= 'Dengan memohon rahmat dan ridho Allah SWT. kami bermaksud mengundang Bapak/Ibu/Saudara/i '. $model->receiver_name .' untuk hadir dalam acara pernikahan kami.' . "%0D%0A%0D%0A";
+        $urlEncode .= 'Untuk Info Detail Acara, Lokasi, dan Waktu Lebih Lengkap bisa akses link undangan online berikut : ' . "%0D%0A%0D%0A";
+        $urlEncode .= $link . "%0D%0A%0D%0A";
+        $urlEncode .= 'Merupakan Suatu Kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu di acara pernikahan kami. ' . "%0D%0A%0D%0A";
+        $urlEncode .= 'Karena keterbatasan jarak dan waktu tidak dapat mengirimkan undangan ini secara langsung, maka melalui undangan online ini dapat menjadi pengganti undangan resmi sehingga tujuan kami tersampaikan.' . "%0D%0A%0D%0A";
+        $urlEncode .= 'Wassallamualaikum Warahmatullahi Wabarakatuh' . "%0D%0A%0D%0A";
         
-        Log::info($urlEncode);
-
         $phoneNumber = substr($model->receiver_number, 0, 1) == '0' ? '62' . substr($model->receiver_number, 1) : (substr($model->receiver_number, 0, 2) == '62' ? $model->receiver_number : '62' . $model->receiver_number);
 
         return redirect("https://api.whatsapp.com/send?phone=". $phoneNumber ."&text=".$urlEncode."");
