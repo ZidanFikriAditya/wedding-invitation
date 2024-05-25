@@ -34,7 +34,7 @@ class ShareLetterController extends Controller
                 return "
                     <a href='javascript:;' data-bs-toggle='modal' data-bs-target='#modal-edit-invitation' data-id='". cryptId($model->id) ."' class='btn btn-sm btn-warning'><i class='ti ti-pencil'></i></a>
                     <a href='javascript:;' class='btn btn-sm btn-danger' onclick='handleDelete(\"" . cryptId($model->id) . "\")'><i class='ti ti-trash'></i></a>
-                    <a target='blank' href='". route('admin.undangan.sent-status', ['id' => cryptId($model->id), 'status' => 'sending']) ."' class='btn btn-sm btn-primary'><i class='ti ti-share'></i></a>
+                    <a target='blank' href='". route('admin.undangan.sent-status', ['id' => cryptId($model->id), 'status' => 'sending']) ."' class='btn btn-sm btn-". (in_array($model->status, ['sended', 'sending']) ? '' : 'outline-') ."primary' ". (in_array($model->status, ['sended', 'sending']) ? "onclick='handleSendingInv(event)'" : "") ."><i class='ti ti-share'></i></a>
                 ";
             })
             ->rawColumns(['action'])

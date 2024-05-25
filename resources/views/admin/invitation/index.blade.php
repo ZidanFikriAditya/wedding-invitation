@@ -17,6 +17,12 @@
     <div class="card">
         <div class="card-body">
             <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-dismissible show" style="display: none" id="alert-bootstrap" role="alert">
+                        <strong>!</strong><span></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
                 <div class="col-md-4"></div>
                 <div class="col-md-8 mb-3 text-end">
                     <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modal-import-excel">
@@ -80,10 +86,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <div class="alert alert-dismissible show" style="display: none" id="alert-bootstrap" role="alert">
-                <strong>!</strong><span></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
             <div class="row" id="body-add-invitation">
                 
             </div>
@@ -107,10 +109,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <div class="alert alert-dismissible show" style="display: none" id="alert-bootstrap" role="alert">
-                <strong>!</strong><span></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
             <div class="row" id="body-edit-invitation">
                 
             </div>
@@ -124,6 +122,24 @@
     </div>
 
     <div class="modal fade" id="modal-delete-invitation" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Hapus Undangan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Apakah anda yakin ingin menghapus undangan ini?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <button type="button" class="btn btn-danget" onclick="deleteInvitation()">Hapus</button>
+        </div>
+        </div>
+    </div>
+    </div>
+    
+    <div class="modal fade" id="modal-alert-al" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
@@ -319,6 +335,12 @@
             function handleDelete(id) {
                 window.idInvitation = id;
                 $('#modal-delete-invitation').modal('show');
+            }
+
+            function handleSendingInv(e) {
+                e.preventDefault();
+
+                window.open(e.target.getAttribute('href'), '_blank');
             }
 
             addInvitations();
