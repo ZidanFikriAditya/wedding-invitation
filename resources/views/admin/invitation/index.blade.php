@@ -340,7 +340,7 @@
             function handleSendingInv(e) {
                 e.preventDefault();
 
-                window.open(e.target.getAttribute('href'), '_blank');
+                window.open(e.currentTarget.getAttribute('href'), '_blank');
             }
 
             addInvitations();
