@@ -33,6 +33,7 @@
                                 <tr>
                                     <th>Nomor Undangan</th>
                                     <th>Kepada</th>
+                                    <th>Nomor</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
