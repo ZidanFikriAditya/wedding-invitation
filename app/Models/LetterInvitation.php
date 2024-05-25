@@ -28,7 +28,10 @@ class LetterInvitation extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $number = LetterInvitation::latest()->first()?->letter_number;
+            $number = LetterInvitation::query()
+                ->orderBy('id', 'desc')
+                ->first()?->letter_number;
+                
             Log::info([
                 'number' => substr($number, 10),
                 'number_int' => (int) substr($number, 10),
