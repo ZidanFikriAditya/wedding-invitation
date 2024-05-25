@@ -169,7 +169,7 @@ class ShareLetterController extends Controller
         $urlEncode .= $link . "%0D%0A%0D%0A";
         $urlEncode .= 'Merupakan Suatu Kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu di acara pernikahan kami. ' . "%0D%0A%0D%0A";
         $urlEncode .= 'Karena keterbatasan jarak dan waktu tidak dapat mengirimkan undangan ini secara langsung, maka melalui undangan online ini dapat menjadi pengganti undangan resmi sehingga tujuan kami tersampaikan.' . "%0D%0A%0D%0A";
-        $urlEncode .= 'Wassallamualaikum Warahmatullahi Wabarakatuh' . "%0D%0A%0D%0A";
+        $urlEncode .= 'Wassallamualaikum Warahmatullahi Wabarakatuh.';
         
         $phoneNumber = substr($model->receiver_number, 0, 1) == '0' ? '62' . substr($model->receiver_number, 1) : (substr($model->receiver_number, 0, 2) == '62' ? $model->receiver_number : '62' . $model->receiver_number);
 
