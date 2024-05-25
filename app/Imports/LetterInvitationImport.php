@@ -35,10 +35,7 @@ class LetterInvitationImport implements ToCollection
                 return;
             }
 
-            $receiver_number = str_replace(' ', '', $rows[1]);
-            $receiver_number = str_replace('-', '', $rows[1]);
-            $receiver_number = str_replace('+', '', $rows[1]);
-            $receiver_number = str_replace('62', '0', $rows[1]);
+            $receiver_number = str_replace([' ', '-', '+', '62'], ['', '', '', ''], $rows[1]);
 
             $model = new LetterInvitation();
             $model->program_id = $this->programId;
