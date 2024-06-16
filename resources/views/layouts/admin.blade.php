@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ $title ?? '' }} | {{ config('app.name') }}</title>
-  <link rel="shortcut icon" type="image/png" href="{{ url('assets') }}/images/logos/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="{{ url('assets') }}/images/logos/Anyar.jpg" />
   <link rel="stylesheet" href="{{ url('assets') }}/css/styles.min.css" />
   <link rel="stylesheet" href="{{ url('summernote') }}/summernote.min.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
